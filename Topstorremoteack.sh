@@ -1,7 +1,4 @@
 #! /usr/local/bin/zsh
 cd /TopStor
-while true; do
-{
-nc -l 2235 | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD > /tmp/msgrack
-}
-done;
+echo ready > out  &
+nc -lk 2236 < out >/dev/null 

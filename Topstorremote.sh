@@ -6,38 +6,47 @@ ClearExit() {
 	exit 0;
 }
 trap ClearExit HUP
- 
 while true; do
 {
-nc -l 2234 | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD > /tmp/msgremotefile & 
+nc -l 2234 | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD  > /tmp/msgremotefile  &
 read line < /tmp/msgremotefile;
 echo $line > /TopStor/tmplineremote
 stamp=`echo $line | awk '{print $2}'`
 request=`echo $line | awk '{print $1}'`
-searsource=` cat partners.txt | grep "$request" | awk '{print $1}'`; 
-echo $request $searcsource > txt/tmpreq
-ispartner=`echo $searsource | wc -c `
-#echo $line $searsource | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & 
-if [[ $searsource == $request ]]; then
-stamp=`echo $line | awk '{print $2}'`;
-reply=`echo $line | awk '{print $3}'`;
-reqparam=`echo $line | awk '{$1=$2=$3=""; print substr($0,4) }'`;
-instr=`echo $reqparam | awk '{print $1 }'`;
-oper=`echo $reqparam | awk '{$1=""; print substr($0,2) }'`;
-if [[ $reply == "rep" ]];
-then 
-res=`./$instr $oper`;
-echo $stamp Authorized $res | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 ;
+license=`echo $line | awk '{print $4}'`;
+fromtype=`echo $line | awk '{print $5}'`
+if [[ $fromtype == 'ProxysendReInit.sh' ]];
+then
+ receiver=`echo $line | awk '{print $3}'`
+ isreceiveron=`cat receiver.txt | grep -w $receiver | wc -c`;
+ isreceiveron=$((isreceiveron+0));
+ if [[ $isreceiveron -ge 3 ]];
+ then
+  reqparam=`echo $line | awk '{$1=$2=$3=""; print substr($0,4) }'`;
+  instr=`echo $reqparam | awk '{print $1 }'`;
+  oper=`echo $reqparam | awk '{$1=""; print substr($0,2) }'`;
+  ./$instr $stamp $oper > out &;
+  receivers=` cat receiver.txt | grep -v -w $receiver `;
+  echo $receivers > receiver.txt;
+  echo $receiver $stamp >> receiver.txt
+ else
+  echo $stamp waiting receiver > out &
+ fi
 else
-./$instr $oper;
-echo $stamp Authorized received | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 ;
-fi
-echo $reqparam > msgfiletmp;
-sleep 1;
-#echo done | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & ;
-else
-echo $stamp Not Authorized:$line | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & ;
-fi
+ licensed=`cat $line | grep -w $license | wc -c '`;
+ if [[ $licensed -ge 4 ]];
+ then
+  reqparam=`echo $line | awk '{$1=$2=$3=$4=""; print substr($0,5) }'`;
+  instr=`echo $reqparam | awk '{print $1 }'`;
+  oper=`echo $reqparam | awk '{$1=""; print substr($0,2) }'`;
+  ./$instr $stamp $oper > out &;
+  receivers=` cat receiver.txt | grep -v -w $receiver `;
+  echo $receivers > receiver.txt;
+  echo $receiver $stamp $license >> receiver.txt
+  echo $stamp waiting sender > out &
+ else
+  echo $stamp Not_Authorized > out &
+ fi
 }
 done;
 echo it is dead >/TopStor/txt/statusremote.txt
