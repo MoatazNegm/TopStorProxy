@@ -33,12 +33,15 @@ then
  fi
 else
  licensed=`cat license.txt | grep -w "$license" | wc -c `;
+ echo $licensed >> tmplineremote
  if [[ $licensed -ge 4 ]];
  then
   reqparam=`echo $line | awk '{$1=$2=$3=$4=""; print substr($0,5) }'`;
   instr=`echo $reqparam | awk '{print $1 }'`;
   oper=`echo $reqparam | awk '{$1=""; print substr($0,2) }'`;
+  echo ./$instr $stamp $oper >> tmplineremote 
   ./$instr $stamp $oper &;
+  receiver=`echo $line | awk '{print $1}'`
   receivers=` cat receiver.txt | grep -v -w "$receiver" `;
   echo $receivers > receiver.txt;
   echo $receiver $stamp $license >> receiver.txt
