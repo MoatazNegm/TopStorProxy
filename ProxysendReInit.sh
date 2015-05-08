@@ -9,13 +9,24 @@ task=`ps -aux | grep $pp | awk '{print $2}' | wc -c `;
 taskn=$((task+0));
 if [[ $taskn -le 2 ]];
 then
- nc -lk $pp < txt/out$inoutpp > txt/in$inoutpp &
- echo waiting > txt/out$inoutpp;
- pp=$((pp+2));
- mkfifo txt/out$pp;
- nc -lk $pp  > txt/out$pp &
- ./ProxysendReClose.sh $pp $inoutpp &
- echo $stamp waiting waiting $stamp > out & 
+# mkfifo txt/in$pp; mkfifo txt/out$pp
+# nc -lk $pp < txt/in$pp > txt/out$pp &
+# echo waiting > txt/in$pp & ; echo waiting > txt/out$pp &;
+ echo socat TCP4-LISTEN:$pp TCP4-LISTEN:$inoutpp > txt/tmpsocat 
+ /usr/local/bin/socat TCP4-LISTEN:$pp TCP4-LISTEN:$inoutpp &
+ pp=$((pp+1)); inoutpp=$((inoutpp+1));
+ /usr/local/bin/socat TCP4-LISTEN:$inoutpp TCP4-LISTEN:$pp &
+ taskp=`ps -aux | grep $inoutpp | awk '{print $2}' | wc -c `;
+ taskpn=$((taskp+0));
+ if [[ $taskpn -le 2 ]];
+ then
+#  nc -lk $inoutpp < txt/out$pp > txt/in$pp &
+ fi
+# pp=$((pp+2));
+# mkfifo txt/out$pp;
+# nc -lk $pp  > txt/out$pp &
+# ./ProxysendReClose.sh $pp $inoutpp &
+# echo $stamp waiting waiting $stamp > out & 
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  logdata='Initializing_new_send_session_session';
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata`;

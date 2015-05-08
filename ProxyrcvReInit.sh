@@ -9,7 +9,7 @@ if [[ $taskn -le 2 ]];
 then
  mkfifo txt/in$pp;
  mkfifo txt/out$pp;
- nc -lk $pp < txt/in$pp > txt/out$pp &
+# nc -lk $pp < txt/in$pp > txt/out$pp &
  echo waiting > txt/in$pp &;
  receiver=`cat receiver.txt | grep -w "$stamp"`;
  receivers=` cat receiver.txt | grep -v -w "$stamp" `;
@@ -18,10 +18,10 @@ then
  pp=$((pp+2));
  mkfifo txt/in$pp;
  mkfifo txt/out$pp;
- nc -lk $pp < txt/in$pp > txt/out$pp &
+# nc -lk $pp < txt/in$pp > txt/out$pp &
  echo waiting > txt/in$pp &;
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
- logdata='Initializing_new_send_session_session';
+ logdata='Initializing_new_receive_session_session';
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata`;
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
  echo $datenow $timenow :$logdata > ${logging}2

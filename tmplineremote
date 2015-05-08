@@ -1,3 +1,1 @@
-10.3.2.7 iwlaniwlan nop iwlanwlanwlanwlan ProxyrcvReInit.sh 10.3.2.8 3333
-      18
-./ProxyrcvReInit.sh iwlaniwlan 10.3.2.8 3333
+10.3.2.8 1431108147 10.3.2.7 iwlanwlanwlanwlan ProxysendReInit.sh 10.3.2.7 4449
