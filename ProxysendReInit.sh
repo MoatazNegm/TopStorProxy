@@ -9,13 +9,12 @@ task=`ps -aux | grep $pp | awk '{print $2}' | wc -c `;
 taskn=$((task+0));
 if [[ $taskn -le 2 ]];
 then
-# mkfifo txt/in$pp; mkfifo txt/out$pp
-# nc -lk $pp < txt/in$pp > txt/out$pp &
-# echo waiting > txt/in$pp & ; echo waiting > txt/out$pp &;
- echo socat TCP4-LISTEN:$pp TCP4-LISTEN:$inoutpp > txt/tmpsocat 
- /usr/local/bin/socat TCP4-LISTEN:$pp TCP4-LISTEN:$inoutpp &
+ echo socat TCP4-LISTEN:$pp,reuseaddr,forever TCP4-LISTEN:$inoutpp,reuseaddr,forever > txt/tmpsocat 
+ /usr/local/bin/socat TCP4-LISTEN:$pp,reuseaddr,forever TCP4-LISTEN:$inoutpp,reuseaddr,forever &
  pp=$((pp+1)); inoutpp=$((inoutpp+1));
- /usr/local/bin/socat TCP4-LISTEN:$inoutpp TCP4-LISTEN:$pp &
+ /usr/local/bin/socat TCP4-LISTEN:$inoutpp,reuseaddr,forever TCP4-LISTEN:$pp,reuseaddr,forever &
+ pp=$((pp+1)); inoutpp=$((inoutpp+1));
+ /usr/local/bin/socat TCP4-LISTEN:$inoutpp,reuseaddr,forever TCP4-LISTEN:$pp,reuseaddr,forever &
  taskp=`ps -aux | grep $inoutpp | awk '{print $2}' | wc -c `;
  taskpn=$((taskp+0));
  if [[ $taskpn -le 2 ]];
