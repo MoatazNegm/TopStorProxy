@@ -1,1 +1,1 @@
-socat TCP4-LISTEN:4449,reuseaddr,forever TCP4-LISTEN:5555,reuseaddr,forever
+socat TCP4-LISTEN:15376,reuseaddr,forever TCP4-LISTEN:Mezo1,reuseaddr,forever
