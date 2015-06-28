@@ -1,0 +1,1 @@
+/usr/local/bin/socat TCP4-LISTEN:15832,reuseaddr TCP4-LISTEN:15378,reuseaddr

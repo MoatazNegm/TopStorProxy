@@ -10,6 +10,7 @@ trap ClearExit HUP
 oldstamp=();
 rcvoldstamp="007";
 sndoldstamp="007"
+./ProxySVC.sh  &
 while true; do
 {
  nc -l 2234 | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD  > /tmp/msgremotefile  &
@@ -32,19 +33,15 @@ while true; do
     echo $oldstamp[$pp] is $stamp >> txt/proxystamp;
     searchs=${request}' '${receiver}
     isreceivero=`cat receiver.txt | grep -w "$searchs" | grep -w "$passphrase" | awk -F"$license"  '{print $1}'`;
+    echo isreceivero $isreceivero >> txt/proxystamp;
     isreceiveron=`echo $isreceivero | wc -c`;
     isreceiveron=$((isreceiveron+0));
     if [[ $isreceiveron -ge 3 ]];
     then
      leftlines=`cat receiver.txt | grep -v -w "$searchs" `
      echo $leftlines > receiver.txt
-     echo $isreceivero $license $pp $stamp >> receiver.txt 
-     inoutpp=`echo $isreceivero | awk '{print $5}'`;
-     reqparam=`echo $line | awk '{$1=$2=$3=$4=""; print substr($0,5) }'`;
-     instr=`echo $reqparam | awk '{print $1 }'`;
-     oper=`echo $reqparam | awk '{$1=""; print substr($0,2) }'`;
-     ./$instr $stamp ${receiver} $pp $inoutpp > tmpl &;
-     echo ./$instr $stamp ${receiver} $pp $inoutpp > tmpl &;
+     echo ${isreceivero}${license} $pp $stamp >> receiver.txt 
+     echo ${isreceivero}${license} $pp $stamp >> txt/proxystamp; 
     else
      echo $stamp waiting receiver > out &
     fi
@@ -61,9 +58,9 @@ while true; do
     then
      searchs=${receiver}' '${request}
      receivers=` cat receiver.txt | grep -v -w "$searchs"`;
+     thissender=` cat receiver.txt | grep -w "$searchs" | awk -F"$license" '{print $2}'`;
      echo $receivers > receiver.txt;
-     thissender=` cat receiver.txt | grep -w "$searchs" | awk -F"$license" '{$1=""; print substr($0,2)}'`;
-     echo $receiver $request $stamp $passphrase $pp $license $thissender >> receiver.txt
+     echo $receiver $request $stamp $passphrase $pp ${license}${thissender} >> receiver.txt
      echo $stamp waiting sender > out &
     else
      echo $stamp Not_Authorized > out &

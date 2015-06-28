@@ -14,7 +14,8 @@ then
  pp=$((pp+1)); inoutpp=$((inoutpp+1));
  /usr/local/bin/socat TCP4-LISTEN:$inoutpp,reuseaddr,forever TCP4-LISTEN:$pp,reuseaddr,forever &
  pp=$((pp+1)); inoutpp=$((inoutpp+1));
- /usr/local/bin/socat TCP4-LISTEN:$inoutpp,reuseaddr,forever TCP4-LISTEN:$pp,reuseaddr,forever &
+ /usr/local/bin/socat TCP4-LISTEN:$inoutpp,reuseaddr TCP4-LISTEN:$pp,reuseaddr 2>txt/socerr &
+ echo /usr/local/bin/socat TCP4-LISTEN:$inoutpp,reuseaddr TCP4-LISTEN:$pp,reuseaddr > txt/zfs${pp}.txt 
  taskp=`ps -aux | grep $inoutpp | awk '{print $2}' | wc -c `;
  taskpn=$((taskp+0));
  if [[ $taskpn -le 2 ]];
